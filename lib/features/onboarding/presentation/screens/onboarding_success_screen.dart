@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:astrea/core/theme/app_theme.dart';
+import 'package:astrea/core/widgets/widgets.dart';
 import 'package:astrea/features/onboarding/data/models/accessibility_profile.dart';
 
 class OnboardingSuccessScreen extends StatelessWidget {
@@ -147,7 +148,8 @@ class OnboardingSuccessScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              ElevatedButton(
+              AstreaButton.primary(
+                label: 'Commencer l\'exploration',
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -159,27 +161,13 @@ class OnboardingSuccessScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                  minimumSize: const Size.fromHeight(52),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text('Commencer l\'exploration'),
               ),
               if (onRestart != null) ...<Widget>[
                 const SizedBox(height: AppSpacing.s12),
-                TextButton(
+                AstreaButton(
+                  label: 'Recommencer l\'onboarding (Démo)',
+                  variant: AstreaButtonVariant.text,
                   onPressed: onRestart,
-                  child: Text(
-                    'Recommencer l\'onboarding (Démo)',
-                    style: AppTypography.corpsMd.copyWith(
-                      color: AppColors.muted,
-                    ),
-                  ),
                 ),
               ],
             ],

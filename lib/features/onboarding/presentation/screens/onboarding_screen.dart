@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:astrea/core/theme/app_theme.dart';
+import 'package:astrea/core/widgets/widgets.dart';
 import 'package:astrea/features/onboarding/data/models/accessibility_profile.dart';
 import 'package:astrea/features/onboarding/presentation/bloc/profile_bloc.dart';
 import 'package:astrea/features/onboarding/presentation/bloc/profile_event.dart';
@@ -112,45 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
         return Scaffold(
           backgroundColor: AppColors.page,
-          appBar: AppBar(
-            elevation: 0,
-            centerTitle: true,
-            title: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'Astrea',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.ink,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: AppColors.borderStrong,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Profil d\'accès',
-                    style: AppTypography.corpsMd.copyWith(
-                      color: AppColors.muted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          appBar: const AstreaAppBar(subtitle: 'Profil d\'accès'),
           body: SafeArea(
             child: Column(
               children: <Widget>[
@@ -556,6 +519,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildBottomBar(BuildContext context, ProfileState state) {
     final bool isLastStep = state.currentStep == state.totalSteps - 1;
     final bool isLoading = state.status == ProfileSubmissionStatus.loading;
+    final bool canProceed = state.isCurrentStepValid && !isLoading;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -567,7 +531,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: <Widget>[
           if (state.currentStep > 0) ...<Widget>[
             Expanded(
-              child: OutlinedButton(
+              child: AstreaButton.outlined(
+                label: 'Retour',
                 onPressed: isLoading
                     ? null
                     : () {
@@ -575,17 +540,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const ProfilePreviousStepRequested(),
                         );
                       },
-                child: const Text('Retour'),
               ),
             ),
             const SizedBox(width: AppSpacing.s12),
           ],
           Expanded(
             flex: 2,
-            child: ElevatedButton(
-              onPressed: (!state.isCurrentStepValid || isLoading)
-                  ? null
-                  : () {
+            child: AstreaButton.primary(
+              label: isLastStep ? 'Valider mon profil' : 'Continuer',
+              icon: isLastStep
+                  ? Icons.check_circle_rounded
+                  : Icons.arrow_forward_rounded,
+              isLoading: isLoading,
+              onPressed: canProceed
+                  ? () {
                       if (isLastStep) {
                         context.read<ProfileBloc>().add(
                           const ProfileSubmitted(),
@@ -595,55 +563,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const ProfileNextStepRequested(),
                         );
                       }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                disabledBackgroundColor: AppColors.border,
-                foregroundColor: AppColors.onPrimary,
-                disabledForegroundColor: AppColors.muted,
-                minimumSize: const Size.fromHeight(52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                ),
-                elevation: 0,
-              ),
-              child: isLoading
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.onPrimary,
-                        ),
-                      ),
-                    )
-                  : FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            isLastStep ? 'Valider mon profil' : 'Continuer',
-                            style: AppTypography.corpsLgGras.copyWith(
-                              color: (!state.isCurrentStepValid || isLoading)
-                                  ? AppColors.muted
-                                  : AppColors.onPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Icon(
-                            isLastStep
-                                ? Icons.check_circle_rounded
-                                : Icons.arrow_forward_rounded,
-                            size: 20,
-                            color: (!state.isCurrentStepValid || isLoading)
-                                ? AppColors.muted
-                                : AppColors.onPrimary,
-                          ),
-                        ],
-                      ),
-                    ),
+                    }
+                  : null,
             ),
           ),
         ],
