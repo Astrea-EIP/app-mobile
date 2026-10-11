@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:astrea/features/onboarding/data/repositories/profile_repository.dart';
 import 'package:astrea/main.dart';
 
 void main() {
-  testWidgets('App smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('App smoke test shows onboarding', (WidgetTester tester) async {
+    final ProfileRepository repository = MockProfileRepository();
+    await tester.pumpWidget(MyApp(profileRepository: repository));
 
-    // Verify that our app shows the initial text.
-    expect(find.text('Astrea App'), findsOneWidget);
+    expect(find.text('Astrea'), findsOneWidget);
+    expect(find.text('Comment vous déplacez-vous ?'), findsOneWidget);
   });
 }
