@@ -114,20 +114,36 @@ Le thème (`lib/core/theme/app_theme.dart`) implémente strictement les tokens d
 
 ---
 
-## Stratégie de Tests
+## Composants Réutilisables du Design System (`lib/core/widgets/`)
+
+Pour garantir la maintenabilité et éviter toute duplication de code à travers les futures fonctionnalités de l'application (profil, réglages, guidage GPS, recherche de POI, filtres), un ensemble de composants génériques réutilisables est exposé via `package:astrea/core/widgets/widgets.dart` :
+
+- **`AstreaButton`** : Bouton universel accessible conforme RGAA (hauteur min 52 dp, ratio contraste certifié 5.55:1, spinner de chargement intégré, gestion de texte flexible prévenant l'overflow).
+  - `AstreaButton.primary` : Bouton vert d'action principale (`#4CAF50`).
+  - `AstreaButton.outlined` : Bouton secondaire avec bordure contrastée.
+  - `AstreaButton.text` : Bouton discret pour actions secondaires (ex. recommencer démo).
+- **`AstreaToggleTile`** : Ligne d'option interactive avec pastille d'icône thématique, titre, sous-titre explicatif et interrupteur adaptatif nativement accessible.
+- **`AstreaSelectableCard`** : Carte de sélection avec pastille colorée, description, badge d'état ('Sélectionné') et indicateur radio animé.
+- **`AstreaSegmentedProgressBar`** : Stepper de progression à dégradé de marque continu (`#43A047` → `#FFA726`) via `ShaderMask`.
+- **`AstreaAppBar`** : Barre supérieure standardisée avec titre 'Astrea', séparateur centré et sous-titre de contexte.
+
+---
+
+## Stratégie de Tests (77 tests automatisés · 100% de réussite)
 
 La suite de tests automatisée couvre 100% de la chaîne de valeur :
 
 1. **Tests Unitaires Thème** (`test/core/theme/app_theme_test.dart`) : Conformité des tokens de couleurs, espacements, rayons et typographie.
-2. **Tests Unitaires Modèles** (`test/features/onboarding/data/models/accessibility_profile_test.dart`) : Sérialisation JSON, valeurs limites des dimensions, égalité immuable.
-3. **Tests Unitaires Repository** (`test/features/onboarding/data/repositories/profile_repository_test.dart`) : Persistance en mémoire et gestion des erreurs de communication.
-4. **Tests Unitaires BLoC** (`test/features/onboarding/presentation/bloc/profile_bloc_test.dart`) : Transitions d'état, validation conditionnelle et flux d'erreurs.
-5. **Tests de Composants Widgets** (`test/features/onboarding/presentation/widgets/`) :
+2. **Tests des Composants Réutilisables** (`test/core/widgets/astrea_widgets_test.dart`) : Comportement des boutons (primary, outlined, text, loading, disabled), tuiles de toggle, cartes sélectionnables, barre de progression et AppBar.
+3. **Tests Unitaires Modèles** (`test/features/onboarding/data/models/accessibility_profile_test.dart`) : Sérialisation JSON, valeurs limites des dimensions, égalité immuable.
+4. **Tests Unitaires Repository** (`test/features/onboarding/data/repositories/profile_repository_test.dart`) : Persistance en mémoire et gestion des erreurs de communication.
+5. **Tests Unitaires BLoC** (`test/features/onboarding/presentation/bloc/profile_bloc_test.dart`) : Transitions d'état, validation conditionnelle et flux d'erreurs.
+6. **Tests de Composants Métier** (`test/features/onboarding/presentation/widgets/`) :
    - `onboarding_progress_bar_test.dart` : Rendu du dégradé continu et des segments.
    - `mobility_type_card_test.dart` : Rendu des cartes, pastilles et sélection.
    - `preference_toggle_tile_test.dart` : Interactivité des interrupteurs adaptatifs.
    - `dimensions_step_form_test.dart` : Validation en direct des champs numériques.
-6. **Tests d'Intégration Parcours** (`test/features/onboarding/presentation/screens/`) :
+7. **Tests d'Intégration Parcours** (`test/features/onboarding/presentation/screens/`) :
    - `onboarding_screen_test.dart` : Parcours piéton complet (saut conditionnel d'étape), parcours fauteuil (saisie des dimensions, navigation retour), soumission et affichage du succès.
    - `onboarding_success_screen_test.dart` : Synthèse récapitulative et bouton de réinitialisation.
 
