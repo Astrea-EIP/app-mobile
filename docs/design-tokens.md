@@ -1,12 +1,12 @@
 # Design tokens
 
-Les constantes Dart de [lib/core/design_tokens.dart](../lib/core/design_tokens.dart) sont générées depuis `tokens.json` du dépôt central `Astrea-EIP/docs`, source partagée du design system Astrea.
+The Dart constants in [lib/core/design_tokens.dart](../lib/core/design_tokens.dart) are generated from `tokens.json` in the central `Astrea-EIP/docs` repository, the shared source for the Astrea design system.
 
-Ne modifiez pas directement la sortie Dart : mettez à jour la source canonique dans `Astrea-EIP/docs/design-tokens/tokens.json`, lancez `pnpm tokens:generate` dans ce dépôt, puis synchronisez ce fichier.
+Do not edit the Dart output directly: update the canonical source in `Astrea-EIP/docs/design-tokens/tokens.json`, run `pnpm tokens:generate` in that repository, then synchronize this file.
 
-Les familles Montserrat et Inter sont embarquées localement dans `assets/fonts/`, avec les graisses `400`, `600` et `700`, et déclarées dans `pubspec.yaml`. Les fichiers sont distribués sous la licence SIL Open Font License ; les notices `OFL.txt` sont conservées avec chaque famille.
+The Montserrat and Inter families are bundled locally in `assets/fonts/`, with weights `400`, `600`, and `700`, and declared in `pubspec.yaml`. The files are distributed under the SIL Open Font License; `OFL.txt` notices are kept with each family.
 
-Dans une PR qui met à jour ces fichiers, indiquer la version utilisée :
+In a pull request that updates these files, state the version used:
 
 ```text
 Design tokens source: docs@<commit-or-tag>
