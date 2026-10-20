@@ -31,6 +31,12 @@ class AppColors {
   static const Color page = Color(0xFFFAF7F2); // Fond de page
   static const Color map = Color(0xFFEFEAE0); // Fond de la carte
   static const Color badge = Color(0xFFE8F5E9); // Fond des pastilles vertes
+  static const Color accentBg = Color(
+    0xFFFFF3E0,
+  ); // Fond orange pâle (pastilles/icônes accent)
+  static const Color tertiaryBg = Color(
+    0xFFEBF4FF,
+  ); // Fond bleu pâle (pastilles/icônes tertiary)
 
   // Text
   static const Color ink = Color(0xFF212529); // Texte principal

@@ -276,7 +276,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             icon: Icons.pets_rounded,
             value: prefs.dogFriendly,
             iconColor: AppColors.accentStrong,
-            badgeBg: const Color(0xFFFFF3E0),
+            badgeBg: AppColors.accentBg,
             onChanged: (bool val) {
               context.read<ProfileBloc>().add(ProfileDogFriendlyToggled(val));
             },
@@ -299,7 +299,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             icon: Icons.trending_up_rounded,
             value: prefs.avoidSteepSlopes,
             iconColor: AppColors.tertiary,
-            badgeBg: const Color(0xFFEBF4FF),
+            badgeBg: AppColors.tertiaryBg,
             onChanged: (bool val) {
               context.read<ProfileBloc>().add(
                 ProfileAvoidSteepSlopesToggled(val),
@@ -313,7 +313,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             icon: Icons.terrain_rounded,
             value: prefs.avoidUnevenSurfaces,
             iconColor: AppColors.accentStrong,
-            badgeBg: const Color(0xFFFFF3E0),
+            badgeBg: AppColors.accentBg,
             onChanged: (bool val) {
               context.read<ProfileBloc>().add(
                 ProfileAvoidUnevenSurfacesToggled(val),
@@ -427,7 +427,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           value:
                               '${state.widthCm?.toStringAsFixed(0) ?? "-"} × ${state.lengthCm?.toStringAsFixed(0) ?? "-"} cm',
                           badgeColor: AppColors.accentStrong,
-                          badgeBg: const Color(0xFFFFF3E0),
+                          badgeBg: AppColors.accentBg,
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         _buildSummaryRow(
@@ -435,7 +435,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           value:
                               '${state.maxStepHeightCm?.toStringAsFixed(0) ?? "-"} cm',
                           badgeColor: AppColors.tertiary,
-                          badgeBg: const Color(0xFFEBF4FF),
+                          badgeBg: AppColors.tertiaryBg,
                         ),
                       ],
                       const Divider(height: 24, color: AppColors.border),

@@ -132,7 +132,11 @@ class AstreaSelectableCard extends StatelessWidget {
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      ? const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.surface,
+                        )
                       : null,
                 ),
               ],

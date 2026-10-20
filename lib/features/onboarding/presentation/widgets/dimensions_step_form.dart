@@ -112,7 +112,7 @@ class DimensionsStepForm extends StatelessWidget {
           validator: (String? val) => _validateDimension(val, max: 200),
           icon: Icons.swap_horiz_rounded,
           iconColor: AppColors.accentStrong,
-          badgeBg: const Color(0xFFFFF3E0),
+          badgeBg: AppColors.accentBg,
         ),
         const SizedBox(height: AppSpacing.md),
 
@@ -125,7 +125,7 @@ class DimensionsStepForm extends StatelessWidget {
           validator: (String? val) => _validateDimension(val, max: 250),
           icon: Icons.swap_vert_rounded,
           iconColor: AppColors.tertiary,
-          badgeBg: const Color(0xFFEBF4FF),
+          badgeBg: AppColors.tertiaryBg,
         ),
         const SizedBox(height: AppSpacing.md),
 

@@ -50,9 +50,9 @@ class MobilityTypeCard extends StatelessWidget {
         return AppColors.badge;
       case MobilityType.electricWheelchair:
       case MobilityType.stroller:
-        return const Color(0xFFFFF3E0);
+        return AppColors.accentBg;
       case MobilityType.walkingWithAssistance:
-        return const Color(0xFFEBF4FF);
+        return AppColors.tertiaryBg;
     }
   }
 

@@ -19,6 +19,8 @@ abstract final class AstreaColors {
   static const surface = Color(0xFFFFFFFF);
   static const page = Color(0xFFFAF7F2);
   static const badge = Color(0xFFE8F5E9);
+  static const accentBg = Color(0xFFFFF3E0); // Fond orange pâle
+  static const tertiaryBg = Color(0xFFEBF4FF); // Fond bleu pâle
   static const map = Color(0xFFEFEAE0);
   static const brandGradientStart = Color(0xFF43A047);
   static const brandGradientEnd = Color(0xFFFFA726);
