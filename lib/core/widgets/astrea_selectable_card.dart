@@ -49,7 +49,7 @@ class AstreaSelectableCard extends StatelessWidget {
                 ]
               : const <BoxShadow>[
                   BoxShadow(
-                    color: Color(0x0A000000),
+                    color: AppColors.shadow,
                     blurRadius: 4,
                     offset: Offset(0, 2),
                   ),

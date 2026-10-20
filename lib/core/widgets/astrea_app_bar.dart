@@ -33,16 +33,7 @@ class AstreaAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'Astrea',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: AppColors.ink,
-                letterSpacing: -0.5,
-              ),
-            ),
+            const Text('Astrea', style: AppTypography.brandTitle),
             if (subtitle != null) ...<Widget>[
               const SizedBox(width: AppSpacing.sm),
               const ExcludeSemantics(

@@ -168,7 +168,7 @@ class AstreaButton extends StatelessWidget {
           onPressed: isEnabled ? onPressed : null,
           style: TextButton.styleFrom(
             foregroundColor: AppColors.muted,
-            minimumSize: Size(isFullWidth ? double.infinity : 0, 48),
+            minimumSize: Size(isFullWidth ? double.infinity : 44, 48),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.lg),

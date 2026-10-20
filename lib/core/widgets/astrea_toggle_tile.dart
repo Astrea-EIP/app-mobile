@@ -37,7 +37,7 @@ class AstreaToggleTile extends StatelessWidget {
           border: Border.all(color: AppColors.border),
           boxShadow: const <BoxShadow>[
             BoxShadow(
-              color: Color(0x08000000),
+              color: AppColors.shadowSm,
               blurRadius: 4,
               offset: Offset(0, 2),
             ),
