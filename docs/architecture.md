@@ -92,7 +92,7 @@ graph LR
 
 ## Design System & Conformité Accessibilité (WCAG 2.2 AA / RGAA)
 
-Le thème (`lib/core/theme/app_theme.dart`) implémente strictement les tokens des **Figma Foundations d'Astrea** :
+Les tokens sont définis dans [`lib/core/design_tokens.dart`](../lib/core/design_tokens.dart) — source de vérité unique synchronisée avec les **Figma Foundations d'Astrea**. `app_theme.dart` expose uniquement des alias (`typedef AppColors = AstreaColors`, etc.) pour que tout le code UI existant continue de fonctionner sans modification.
 
 | Token Figma | Valeur Hex | Usage & Règle d'Accessibilité |
 |---|---|---|
@@ -129,7 +129,7 @@ Pour garantir la maintenabilité et éviter toute duplication de code à travers
 
 ---
 
-## Stratégie de Tests (77 tests automatisés · 100% de réussite)
+## Stratégie de Tests (81 tests automatisés · 100% de réussite)
 
 La suite de tests automatisée couvre 100% de la chaîne de valeur :
 
