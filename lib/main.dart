@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:astrea/core/theme/app_theme.dart';
 import 'package:astrea/features/onboarding/data/repositories/profile_repository.dart';
 import 'package:astrea/features/onboarding/presentation/bloc/profile_bloc.dart';
@@ -24,6 +25,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Astrea',
         theme: AppTheme.lightTheme,
+        locale: const Locale('fr', 'FR'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: const <Locale>[Locale('fr', 'FR')],
         home: const OnboardingScreen(),
       ),
     );

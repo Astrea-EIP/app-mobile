@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:astrea/core/theme/app_theme.dart';
 import 'package:astrea/core/widgets/widgets.dart';
@@ -91,6 +92,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             state.currentStep,
             duration: const Duration(milliseconds: 320),
             curve: Curves.easeInOut,
+          );
+          SemanticsService.sendAnnouncement(
+            View.of(context),
+            'Étape ${state.currentStep + 1} sur ${state.totalSteps}',
+            TextDirection.ltr,
           );
         }
       },
