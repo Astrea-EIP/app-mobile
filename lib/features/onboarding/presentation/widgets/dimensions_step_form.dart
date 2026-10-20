@@ -187,16 +187,23 @@ class DimensionsStepForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s12),
-          TextFormField(
-            controller: controller,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: validator,
-            onChanged: (_) => onChanged(),
-            decoration: InputDecoration(
-              hintText: hint,
-              suffixText: 'cm',
-              suffixStyle: AppTypography.corpsMdGras.copyWith(color: iconColor),
+          Semantics(
+            label: label,
+            child: TextFormField(
+              controller: controller,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: validator,
+              onChanged: (_) => onChanged(),
+              decoration: InputDecoration(
+                hintText: hint,
+                suffixText: 'cm',
+                suffixStyle: AppTypography.corpsMdGras.copyWith(
+                  color: iconColor,
+                ),
+              ),
             ),
           ),
         ],
