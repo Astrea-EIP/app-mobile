@@ -6,6 +6,11 @@ Describe the mobile change delivered by this pull request.
 
 Closes #
 
+## Design tokens source
+
+<!-- Fill this only when the PR changes generated design tokens or their consumers. -->
+`docs@<commit-or-tag>` or `Not applicable`
+
 ## Validation
 
 - [ ] `flutter pub get`
