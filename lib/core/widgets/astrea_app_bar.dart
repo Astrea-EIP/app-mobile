@@ -45,12 +45,16 @@ class AstreaAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             if (subtitle != null) ...<Widget>[
               const SizedBox(width: AppSpacing.sm),
-              Container(
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  color: AppColors.borderStrong,
-                  shape: BoxShape.circle,
+              const ExcludeSemantics(
+                child: SizedBox(
+                  width: 4,
+                  height: 4,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.borderStrong,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),

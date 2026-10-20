@@ -68,15 +68,19 @@ class AstreaButton extends StatelessWidget {
 
     Widget content;
     if (isLoading) {
-      content = SizedBox(
-        width: 22,
-        height: 22,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            variant == AstreaButtonVariant.primary
-                ? AppColors.onPrimary
-                : AppColors.primaryStrong,
+      content = Semantics(
+        label: '$label, chargement en cours',
+        excludeSemantics: true,
+        child: SizedBox(
+          width: 22,
+          height: 22,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              variant == AstreaButtonVariant.primary
+                  ? AppColors.onPrimary
+                  : AppColors.primaryStrong,
+            ),
           ),
         ),
       );
