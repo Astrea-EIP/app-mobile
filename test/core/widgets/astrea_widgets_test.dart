@@ -101,6 +101,29 @@ void main() {
       );
       expect(button.onPressed, isNull);
     });
+
+    testWidgets('loading state announces combined label to screen reader', (
+      WidgetTester tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: Scaffold(
+            body: AstreaButton.primary(
+              label: 'Valider',
+              isLoading: true,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+      expect(
+        find.bySemanticsLabel('Valider, chargement en cours'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
   });
 
   group('AstreaToggleTile', () {
@@ -132,6 +155,39 @@ void main() {
 
       await tester.tap(find.byType(AstreaToggleTile));
       expect(toggledValue, isTrue);
+    });
+
+    testWidgets('exposes toggled state and label to screen reader', (
+      WidgetTester tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: Scaffold(
+            body: AstreaToggleTile(
+              title: 'Éviter les escaliers',
+              subtitle: 'Priorise rampes et ascenseurs',
+              icon: Icons.stairs_rounded,
+              value: true,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.getSemantics(
+          find.bySemanticsLabel(
+            'Éviter les escaliers. Priorise rampes et ascenseurs',
+          ),
+        ),
+        matchesSemantics(
+          label: 'Éviter les escaliers. Priorise rampes et ascenseurs',
+          isToggled: true,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
     });
   });
 
@@ -167,6 +223,37 @@ void main() {
         expect(tapped, isTrue);
       },
     );
+
+    testWidgets('exposes checked state and label to screen reader', (
+      WidgetTester tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: Scaffold(
+            body: AstreaSelectableCard(
+              title: 'Option A',
+              description: 'Description de test',
+              icon: Icons.directions_walk_rounded,
+              isSelected: true,
+              onTap: () {},
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.getSemantics(
+          find.bySemanticsLabel('Option A. Description de test'),
+        ),
+        matchesSemantics(
+          label: 'Option A. Description de test',
+          isChecked: true,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
   });
 
   group('AstreaAppBar', () {
@@ -196,6 +283,21 @@ void main() {
 
       expect(find.byType(AstreaSegmentedProgressBar), findsOneWidget);
       expect(find.byType(ShaderMask), findsOneWidget);
+    });
+
+    testWidgets('announces current step and total to screen reader', (
+      WidgetTester tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AstreaSegmentedProgressBar(currentStep: 2, totalSteps: 4),
+          ),
+        ),
+      );
+      expect(find.bySemanticsLabel('Étape 3 sur 4'), findsOneWidget);
+      handle.dispose();
     });
   });
 }
