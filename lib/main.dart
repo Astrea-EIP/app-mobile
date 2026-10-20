@@ -5,6 +5,8 @@ import 'package:astrea/features/onboarding/data/repositories/profile_repository.
 import 'package:astrea/features/onboarding/presentation/bloc/profile_bloc.dart';
 import 'package:astrea/features/onboarding/presentation/screens/onboarding_screen.dart';
 
+
+
 void main() {
   final ProfileRepository profileRepository = MockProfileRepository();
   runApp(MyApp(profileRepository: profileRepository));
