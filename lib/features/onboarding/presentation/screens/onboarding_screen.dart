@@ -86,6 +86,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           );
         }
 
+        if (state.status == ProfileSubmissionStatus.success) {
+          SemanticsService.sendAnnouncement(
+            View.of(context),
+            'Profil créé avec succès ! Astrea calculera désormais des itinéraires adaptés à vos besoins.',
+            TextDirection.ltr,
+          );
+        }
+
         if (_pageController.hasClients &&
             _pageController.page?.round() != state.currentStep) {
           _pageController.animateToPage(
@@ -373,7 +381,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               border: Border.all(color: AppColors.border),
               boxShadow: const <BoxShadow>[
                 BoxShadow(
-                  color: Color(0x0C000000),
+                  color: AppColors.shadowMd,
                   blurRadius: 10,
                   offset: Offset(0, 4),
                 ),
@@ -405,6 +413,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Icons.verified_user_rounded,
                         color: AppColors.onPrimary,
                         size: 20,
+                        semanticLabel: 'Passeport vérifié',
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
@@ -496,29 +505,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required Color badgeColor,
     required Color badgeBg,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Text(
-          label,
-          style: AppTypography.corpsMd.copyWith(color: AppColors.muted),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.s12,
-            vertical: 4,
+    return MergeSemantics(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            label,
+            style: AppTypography.corpsMd.copyWith(color: AppColors.muted),
           ),
-          decoration: BoxDecoration(
-            color: badgeBg,
-            borderRadius: BorderRadius.circular(AppRadius.full),
-            border: Border.all(color: badgeColor.withAlpha(51)),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.s12,
+              vertical: 4,
+            ),
+            decoration: BoxDecoration(
+              color: badgeBg,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+              border: Border.all(color: badgeColor.withAlpha(51)),
+            ),
+            child: Text(
+              value,
+              style: AppTypography.corpsMdGras.copyWith(color: badgeColor),
+            ),
           ),
-          child: Text(
-            value,
-            style: AppTypography.corpsMdGras.copyWith(color: badgeColor),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

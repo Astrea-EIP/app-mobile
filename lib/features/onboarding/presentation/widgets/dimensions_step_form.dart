@@ -57,7 +57,7 @@ class DimensionsStepForm extends StatelessWidget {
             border: Border.all(color: AppColors.border),
             boxShadow: const <BoxShadow>[
               BoxShadow(
-                color: Color(0x0A000000),
+                color: AppColors.shadow,
                 blurRadius: 6,
                 offset: Offset(0, 2),
               ),
@@ -77,6 +77,7 @@ class DimensionsStepForm extends StatelessWidget {
                   Icons.info_outline_rounded,
                   color: AppColors.primaryStrong,
                   size: 24,
+                  semanticLabel: 'Information',
                 ),
               ),
               const SizedBox(width: AppSpacing.s12),
@@ -162,7 +163,7 @@ class DimensionsStepForm extends StatelessWidget {
         border: Border.all(color: AppColors.border),
         boxShadow: const <BoxShadow>[
           BoxShadow(
-            color: Color(0x08000000),
+            color: AppColors.shadowSm,
             blurRadius: 4,
             offset: Offset(0, 2),
           ),
@@ -187,23 +188,17 @@ class DimensionsStepForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s12),
-          Semantics(
-            label: label,
-            child: TextFormField(
-              controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: validator,
-              onChanged: (_) => onChanged(),
-              decoration: InputDecoration(
-                hintText: hint,
-                suffixText: 'cm',
-                suffixStyle: AppTypography.corpsMdGras.copyWith(
-                  color: iconColor,
-                ),
-              ),
+          TextFormField(
+            controller: controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: validator,
+            onChanged: (_) => onChanged(),
+            decoration: InputDecoration(
+              labelText: label,
+              hintText: hint,
+              suffixText: 'cm',
+              suffixStyle: AppTypography.corpsMdGras.copyWith(color: iconColor),
             ),
           ),
         ],

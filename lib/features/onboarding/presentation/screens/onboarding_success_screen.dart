@@ -56,92 +56,102 @@ class OnboardingSuccessScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: Column(
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            'Mobilité',
-                            style: AppTypography.corpsMd.copyWith(
-                              color: AppColors.muted,
+                      MergeSemantics(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Mobilité',
+                              style: AppTypography.corpsMd.copyWith(
+                                color: AppColors.muted,
+                              ),
                             ),
-                          ),
-                          Text(
-                            profile.mobilityType.displayName,
-                            style: AppTypography.corpsMdGras,
-                          ),
-                        ],
+                            Text(
+                              profile.mobilityType.displayName,
+                              style: AppTypography.corpsMdGras,
+                            ),
+                          ],
+                        ),
                       ),
                       if (profile.dimensions != null) ...<Widget>[
                         const Divider(
                           height: AppSpacing.lg,
                           color: AppColors.border,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              'Dimensions (L × L)',
-                              style: AppTypography.corpsMd.copyWith(
-                                color: AppColors.muted,
+                        MergeSemantics(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Dimensions (L × L)',
+                                style: AppTypography.corpsMd.copyWith(
+                                  color: AppColors.muted,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${profile.dimensions!.widthCm.toStringAsFixed(0)} × ${profile.dimensions!.lengthCm.toStringAsFixed(0)} cm',
-                              style: AppTypography.corpsMdGras,
-                            ),
-                          ],
+                              Text(
+                                '${profile.dimensions!.widthCm.toStringAsFixed(0)} × ${profile.dimensions!.lengthCm.toStringAsFixed(0)} cm',
+                                style: AppTypography.corpsMdGras,
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              'Seuil max de marche',
-                              style: AppTypography.corpsMd.copyWith(
-                                color: AppColors.muted,
+                        MergeSemantics(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Seuil max de marche',
+                                style: AppTypography.corpsMd.copyWith(
+                                  color: AppColors.muted,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${profile.dimensions!.maxStepHeightCm.toStringAsFixed(0)} cm',
-                              style: AppTypography.corpsMdGras,
-                            ),
-                          ],
+                              Text(
+                                '${profile.dimensions!.maxStepHeightCm.toStringAsFixed(0)} cm',
+                                style: AppTypography.corpsMdGras,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                       const Divider(
                         height: AppSpacing.lg,
                         color: AppColors.border,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            'Chiens acceptés',
-                            style: AppTypography.corpsMd.copyWith(
-                              color: AppColors.muted,
+                      MergeSemantics(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Chiens acceptés',
+                              style: AppTypography.corpsMd.copyWith(
+                                color: AppColors.muted,
+                              ),
                             ),
-                          ),
-                          Text(
-                            profile.preferences.dogFriendly ? 'Oui' : 'Non',
-                            style: AppTypography.corpsMdGras,
-                          ),
-                        ],
+                            Text(
+                              profile.preferences.dogFriendly ? 'Oui' : 'Non',
+                              style: AppTypography.corpsMdGras,
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.sm),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            'Éviter les escaliers',
-                            style: AppTypography.corpsMd.copyWith(
-                              color: AppColors.muted,
+                      MergeSemantics(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Éviter les escaliers',
+                              style: AppTypography.corpsMd.copyWith(
+                                color: AppColors.muted,
+                              ),
                             ),
-                          ),
-                          Text(
-                            profile.preferences.avoidStairs ? 'Oui' : 'Non',
-                            style: AppTypography.corpsMdGras,
-                          ),
-                        ],
+                            Text(
+                              profile.preferences.avoidStairs ? 'Oui' : 'Non',
+                              style: AppTypography.corpsMdGras,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
