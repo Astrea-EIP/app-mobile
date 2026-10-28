@@ -347,6 +347,21 @@ void main() {
       expect(updatedPrefs.preferences.dogFriendly, isTrue);
     });
 
+    test('copyWith can clear dimensions back to null', () {
+      const WheelchairDimensions dims = WheelchairDimensions(
+        widthCm: 70,
+        lengthCm: 110,
+        maxStepHeightCm: 4,
+      );
+      const AccessibilityProfile withDims = AccessibilityProfile(
+        mobilityType: MobilityType.manualWheelchair,
+        dimensions: dims,
+        preferences: RoutePreferences(),
+      );
+      final AccessibilityProfile cleared = withDims.copyWith(dimensions: null);
+      expect(cleared.dimensions, isNull);
+    });
+
     test('equality and props work as expected', () {
       const AccessibilityProfile p1 = AccessibilityProfile(
         mobilityType: MobilityType.pedestrian,

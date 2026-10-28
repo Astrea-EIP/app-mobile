@@ -203,14 +203,18 @@ class AccessibilityProfile extends Equatable {
     return true;
   }
 
+  static const Object _undefined = Object();
+
   AccessibilityProfile copyWith({
     MobilityType? mobilityType,
-    WheelchairDimensions? dimensions,
+    Object? dimensions = _undefined,
     RoutePreferences? preferences,
   }) {
     return AccessibilityProfile(
       mobilityType: mobilityType ?? this.mobilityType,
-      dimensions: dimensions ?? this.dimensions,
+      dimensions: dimensions == _undefined
+          ? this.dimensions
+          : dimensions as WheelchairDimensions?,
       preferences: preferences ?? this.preferences,
     );
   }

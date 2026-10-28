@@ -544,6 +544,49 @@ void main() {
       },
     );
 
+    test(
+      'status failure is reset to initial when user changes mobility or dimensions',
+      () async {
+        final MockProfileRepository failingRepo = MockProfileRepository(
+          simulatedDelay: Duration.zero,
+          shouldFail: true,
+        );
+        final ProfileBloc failingBloc = ProfileBloc(
+          profileRepository: failingRepo,
+        );
+
+        failingBloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
+        failingBloc.add(const ProfileStepChanged(3));
+        failingBloc.add(const ProfileSubmitted());
+
+        await expectLater(
+          failingBloc.stream,
+          emitsThrough(
+            predicate<ProfileState>(
+              (ProfileState s) =>
+                  s.status == ProfileSubmissionStatus.failure,
+            ),
+          ),
+        );
+
+        // Changing mobility should reset status to initial
+        failingBloc.add(
+          const ProfileMobilitySelected(MobilityType.manualWheelchair),
+        );
+        await expectLater(
+          failingBloc.stream,
+          emits(
+            predicate<ProfileState>(
+              (ProfileState s) =>
+                  s.status == ProfileSubmissionStatus.initial,
+            ),
+          ),
+        );
+
+        failingBloc.close();
+      },
+    );
+
     test('ProfileResetRequested resets state to initial', () async {
       bloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
       bloc.add(const ProfileResetRequested());

@@ -28,7 +28,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     ProfileMobilitySelected event,
     Emitter<ProfileState> emit,
   ) {
-    emit(state.copyWith(mobilityType: event.mobilityType, clearError: true));
+    emit(
+      state.copyWith(
+        mobilityType: event.mobilityType,
+        status: state.status == ProfileSubmissionStatus.failure
+            ? ProfileSubmissionStatus.initial
+            : null,
+        clearError: true,
+      ),
+    );
   }
 
   void _onDimensionsChanged(
@@ -40,6 +48,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         widthCm: event.widthCm,
         lengthCm: event.lengthCm,
         maxStepHeightCm: event.maxStepHeightCm,
+        status: state.status == ProfileSubmissionStatus.failure
+            ? ProfileSubmissionStatus.initial
+            : null,
         clearError: true,
       ),
     );
