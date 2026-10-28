@@ -7,6 +7,7 @@ class DimensionsStepForm extends StatelessWidget {
     required this.lengthController,
     required this.stepHeightController,
     required this.onChanged,
+    required this.formKey,
     super.key,
   });
 
@@ -14,6 +15,7 @@ class DimensionsStepForm extends StatelessWidget {
   final TextEditingController lengthController;
   final TextEditingController stepHeightController;
   final VoidCallback onChanged;
+  final GlobalKey<FormState> formKey;
 
   String? _validateDimension(String? value, {required double max}) {
     if (value == null || value.trim().isEmpty) {
@@ -45,7 +47,9 @@ class DimensionsStepForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Form(
+      key: formKey,
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // Info card with warm border
@@ -142,7 +146,7 @@ class DimensionsStepForm extends StatelessWidget {
           badgeBg: AppColors.badge,
         ),
       ],
-    );
+    ));
   }
 
   Widget _buildDimensionField({

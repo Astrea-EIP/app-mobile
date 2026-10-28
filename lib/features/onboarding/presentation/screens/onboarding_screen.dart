@@ -25,6 +25,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final TextEditingController _widthController;
   late final TextEditingController _lengthController;
   late final TextEditingController _stepHeightController;
+  final GlobalKey<FormState> _dimensionsFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -255,6 +256,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             lengthController: _lengthController,
             stepHeightController: _stepHeightController,
             onChanged: _syncDimensionsToBloc,
+            formKey: _dimensionsFormKey,
           ),
         ],
       ),
@@ -535,7 +537,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildBottomBar(BuildContext context, ProfileState state) {
     final bool isLastStep = state.currentStep == state.totalSteps - 1;
     final bool isLoading = state.status == ProfileSubmissionStatus.loading;
-    final bool canProceed = state.isCurrentStepValid && !isLoading;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -568,19 +569,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ? Icons.check_circle_rounded
                   : Icons.arrow_forward_rounded,
               isLoading: isLoading,
-              onPressed: canProceed
-                  ? () {
+              onPressed: isLoading
+                  ? null
+                  : () {
                       if (isLastStep) {
+                        if (!state.isCurrentStepValid) return;
                         context.read<ProfileBloc>().add(
                           const ProfileSubmitted(),
                         );
                       } else {
+                        if (state.currentStep == 1) {
+                          _dimensionsFormKey.currentState?.validate();
+                        }
                         context.read<ProfileBloc>().add(
                           const ProfileNextStepRequested(),
                         );
                       }
-                    }
-                  : null,
+                    },
             ),
           ),
         ],
