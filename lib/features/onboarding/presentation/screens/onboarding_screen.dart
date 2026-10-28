@@ -564,7 +564,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             flex: 2,
             child: GestureDetector(
-              onTap: state.currentStep == 1 &&
+              onTap:
+                  state.currentStep == 1 &&
                       !state.isCurrentStepValid &&
                       !isLoading
                   ? () => _dimensionsFormKey.currentState?.validate()

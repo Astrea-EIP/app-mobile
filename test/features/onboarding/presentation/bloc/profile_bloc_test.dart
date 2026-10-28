@@ -416,26 +416,29 @@ void main() {
       },
     );
 
-    test('ProfileSubmitted is ignored if already loading or succeeded', () async {
-      bloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
-      bloc.add(const ProfileStepChanged(3));
-      bloc.add(const ProfileSubmitted());
-      bloc.add(const ProfileSubmitted()); // second — must be dropped
+    test(
+      'ProfileSubmitted is ignored if already loading or succeeded',
+      () async {
+        bloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
+        bloc.add(const ProfileStepChanged(3));
+        bloc.add(const ProfileSubmitted());
+        bloc.add(const ProfileSubmitted()); // second — must be dropped
 
-      await expectLater(
-        bloc.stream,
-        emitsThrough(
-          predicate<ProfileState>(
-            (ProfileState s) => s.status == ProfileSubmissionStatus.success,
+        await expectLater(
+          bloc.stream,
+          emitsThrough(
+            predicate<ProfileState>(
+              (ProfileState s) => s.status == ProfileSubmissionStatus.success,
+            ),
           ),
-        ),
-      );
+        );
 
-      // Let the event queue drain so the second event has been processed
-      await Future<void>.delayed(Duration.zero);
+        // Let the event queue drain so the second event has been processed
+        await Future<void>.delayed(Duration.zero);
 
-      expect(repository.saveCallCount, equals(1));
-    });
+        expect(repository.saveCallCount, equals(1));
+      },
+    );
 
     test('ProfileSubmitted blocked if profile cannot submit', () async {
       bloc.add(const ProfileSubmitted());
@@ -558,8 +561,7 @@ void main() {
           failingBloc.stream,
           emitsThrough(
             predicate<ProfileState>(
-              (ProfileState s) =>
-                  s.status == ProfileSubmissionStatus.failure,
+              (ProfileState s) => s.status == ProfileSubmissionStatus.failure,
             ),
           ),
         );
@@ -572,8 +574,7 @@ void main() {
           failingBloc.stream,
           emits(
             predicate<ProfileState>(
-              (ProfileState s) =>
-                  s.status == ProfileSubmissionStatus.initial,
+              (ProfileState s) => s.status == ProfileSubmissionStatus.initial,
             ),
           ),
         );
