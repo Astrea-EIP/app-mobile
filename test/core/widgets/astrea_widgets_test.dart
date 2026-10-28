@@ -184,6 +184,7 @@ void main() {
         matchesSemantics(
           label: 'Éviter les escaliers. Priorise rampes et ascenseurs',
           isToggled: true,
+          hasToggledState: true,
           hasTapAction: true,
         ),
       );
@@ -249,6 +250,7 @@ void main() {
         matchesSemantics(
           label: 'Option A. Description de test',
           isChecked: true,
+          hasCheckedState: true,
           hasTapAction: true,
         ),
       );

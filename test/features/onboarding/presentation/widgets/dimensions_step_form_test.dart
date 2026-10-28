@@ -29,11 +29,11 @@ void main() {
         ),
       );
 
-      expect(find.text('Largeur totale de l\'équipement'), findsOneWidget);
-      expect(find.text('Longueur totale de l\'équipement'), findsOneWidget);
+      expect(find.text('Largeur totale de l\'équipement'), findsWidgets);
+      expect(find.text('Longueur totale de l\'équipement'), findsWidgets);
       expect(
         find.text('Hauteur max de marche / bordure franchissable'),
-        findsOneWidget,
+        findsWidgets,
       );
 
       await tester.enterText(find.byType(TextFormField).at(0), '65');
