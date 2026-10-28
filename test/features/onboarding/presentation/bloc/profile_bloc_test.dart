@@ -416,6 +416,32 @@ void main() {
       },
     );
 
+    test('ProfileSubmitted is ignored if already loading', () async {
+      final MockProfileRepository slowRepo = MockProfileRepository(
+        simulatedDelay: const Duration(seconds: 10),
+      );
+      final ProfileBloc slowBloc = ProfileBloc(profileRepository: slowRepo);
+
+      slowBloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
+      slowBloc.add(const ProfileStepChanged(3));
+      slowBloc.add(const ProfileSubmitted());
+      // Second dispatch while loading — must be ignored
+      slowBloc.add(const ProfileSubmitted());
+
+      await expectLater(
+        slowBloc.stream,
+        emitsThrough(
+          predicate<ProfileState>(
+            (ProfileState s) => s.status == ProfileSubmissionStatus.loading,
+          ),
+        ),
+      );
+
+      // Only one call should have been made (saveProfile not called twice)
+      expect(slowRepo.saveCallCount, equals(1));
+      slowBloc.close();
+    });
+
     test('ProfileSubmitted blocked if profile cannot submit', () async {
       bloc.add(const ProfileSubmitted());
 

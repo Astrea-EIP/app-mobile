@@ -154,6 +154,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     ProfileSubmitted event,
     Emitter<ProfileState> emit,
   ) async {
+    if (state.status == ProfileSubmissionStatus.loading) return;
     if (!state.canSubmit) {
       emit(
         state.copyWith(

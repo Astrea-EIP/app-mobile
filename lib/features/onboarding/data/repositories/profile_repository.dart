@@ -21,9 +21,11 @@ class MockProfileRepository implements ProfileRepository {
   final bool shouldFail;
 
   AccessibilityProfile? _cachedProfile;
+  int saveCallCount = 0;
 
   @override
   Future<void> saveProfile(AccessibilityProfile profile) async {
+    saveCallCount++;
     await Future<void>.delayed(simulatedDelay);
     if (shouldFail) {
       throw Exception('Failed to save accessibility profile. Please retry.');
