@@ -23,6 +23,7 @@ void main() {
                 onChanged: () {
                   changeCount++;
                 },
+                formKey: GlobalKey<FormState>(),
               ),
             ),
           ),
@@ -65,6 +66,7 @@ void main() {
                 lengthController: lengthCtrl,
                 stepHeightController: stepCtrl,
                 onChanged: () {},
+                formKey: GlobalKey<FormState>(),
               ),
             ),
           ),

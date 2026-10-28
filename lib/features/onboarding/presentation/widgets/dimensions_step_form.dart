@@ -50,103 +50,104 @@ class DimensionsStepForm extends StatelessWidget {
     return Form(
       key: formKey,
       child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        // Info card with warm border
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: AppColors.border),
-            boxShadow: const <BoxShadow>[
-              BoxShadow(
-                color: AppColors.shadow,
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppColors.badge,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: AppColors.primaryStrong),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Info card with warm border
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.border),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
                 ),
-                child: const Icon(
-                  Icons.info_outline_rounded,
-                  color: AppColors.primaryStrong,
-                  size: 24,
-                  semanticLabel: 'Information',
+              ],
+            ),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.badge,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: AppColors.primaryStrong),
+                  ),
+                  child: const Icon(
+                    Icons.info_outline_rounded,
+                    color: AppColors.primaryStrong,
+                    size: 24,
+                    semanticLabel: 'Information',
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.s12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'Pourquoi ces dimensions ?',
-                      style: AppTypography.corpsMdGras.copyWith(
-                        color: AppColors.primaryStrong,
+                const SizedBox(width: AppSpacing.s12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Pourquoi ces dimensions ?',
+                        style: AppTypography.corpsMdGras.copyWith(
+                          color: AppColors.primaryStrong,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'Pour calculer des itinéraires évitant passages étroits, tourniquets ou portes infranchissables.',
-                      style: AppTypography.petit,
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Pour calculer des itinéraires évitant passages étroits, tourniquets ou portes infranchissables.',
+                        style: AppTypography.petit,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.s20),
+          const SizedBox(height: AppSpacing.s20),
 
-        // Width Field
-        _buildDimensionField(
-          context: context,
-          label: 'Largeur totale de l\'équipement',
-          hint: 'ex. 65',
-          controller: widthController,
-          validator: (String? val) => _validateDimension(val, max: 200),
-          icon: Icons.swap_horiz_rounded,
-          iconColor: AppColors.accentStrong,
-          badgeBg: AppColors.accentBg,
-        ),
-        const SizedBox(height: AppSpacing.md),
+          // Width Field
+          _buildDimensionField(
+            context: context,
+            label: 'Largeur totale de l\'équipement',
+            hint: 'ex. 65',
+            controller: widthController,
+            validator: (String? val) => _validateDimension(val, max: 200),
+            icon: Icons.swap_horiz_rounded,
+            iconColor: AppColors.accentStrong,
+            badgeBg: AppColors.accentBg,
+          ),
+          const SizedBox(height: AppSpacing.md),
 
-        // Length Field
-        _buildDimensionField(
-          context: context,
-          label: 'Longueur totale de l\'équipement',
-          hint: 'ex. 105',
-          controller: lengthController,
-          validator: (String? val) => _validateDimension(val, max: 250),
-          icon: Icons.swap_vert_rounded,
-          iconColor: AppColors.tertiary,
-          badgeBg: AppColors.tertiaryBg,
-        ),
-        const SizedBox(height: AppSpacing.md),
+          // Length Field
+          _buildDimensionField(
+            context: context,
+            label: 'Longueur totale de l\'équipement',
+            hint: 'ex. 105',
+            controller: lengthController,
+            validator: (String? val) => _validateDimension(val, max: 250),
+            icon: Icons.swap_vert_rounded,
+            iconColor: AppColors.tertiary,
+            badgeBg: AppColors.tertiaryBg,
+          ),
+          const SizedBox(height: AppSpacing.md),
 
-        // Step Height Field
-        _buildDimensionField(
-          context: context,
-          label: 'Hauteur max de marche / bordure franchissable',
-          hint: 'ex. 4',
-          controller: stepHeightController,
-          validator: _validateStepHeight,
-          icon: Icons.height_rounded,
-          iconColor: AppColors.primaryStrong,
-          badgeBg: AppColors.badge,
-        ),
-      ],
-    ));
+          // Step Height Field
+          _buildDimensionField(
+            context: context,
+            label: 'Hauteur max de marche / bordure franchissable',
+            hint: 'ex. 4',
+            controller: stepHeightController,
+            validator: _validateStepHeight,
+            icon: Icons.height_rounded,
+            iconColor: AppColors.primaryStrong,
+            badgeBg: AppColors.badge,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildDimensionField({

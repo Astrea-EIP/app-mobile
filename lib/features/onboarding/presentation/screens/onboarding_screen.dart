@@ -563,29 +563,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ],
           Expanded(
             flex: 2,
-            child: AstreaButton.primary(
-              label: isLastStep ? 'Valider mon profil' : 'Continuer',
-              icon: isLastStep
-                  ? Icons.check_circle_rounded
-                  : Icons.arrow_forward_rounded,
-              isLoading: isLoading,
-              onPressed: isLoading
-                  ? null
-                  : () {
-                      if (isLastStep) {
-                        if (!state.isCurrentStepValid) return;
-                        context.read<ProfileBloc>().add(
-                          const ProfileSubmitted(),
-                        );
-                      } else {
-                        if (state.currentStep == 1) {
-                          _dimensionsFormKey.currentState?.validate();
+            child: GestureDetector(
+              onTap: state.currentStep == 1 &&
+                      !state.isCurrentStepValid &&
+                      !isLoading
+                  ? () => _dimensionsFormKey.currentState?.validate()
+                  : null,
+              child: AstreaButton.primary(
+                label: isLastStep ? 'Valider mon profil' : 'Continuer',
+                icon: isLastStep
+                    ? Icons.check_circle_rounded
+                    : Icons.arrow_forward_rounded,
+                isLoading: isLoading,
+                onPressed: isLoading || !state.isCurrentStepValid
+                    ? null
+                    : () {
+                        if (isLastStep) {
+                          context.read<ProfileBloc>().add(
+                            const ProfileSubmitted(),
+                          );
+                        } else {
+                          if (state.currentStep == 1) {
+                            _dimensionsFormKey.currentState?.validate();
+                          }
+                          context.read<ProfileBloc>().add(
+                            const ProfileNextStepRequested(),
+                          );
                         }
-                        context.read<ProfileBloc>().add(
-                          const ProfileNextStepRequested(),
-                        );
-                      }
-                    },
+                      },
+              ),
             ),
           ),
         ],

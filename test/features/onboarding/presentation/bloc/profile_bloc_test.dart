@@ -416,30 +416,25 @@ void main() {
       },
     );
 
-    test('ProfileSubmitted is ignored if already loading', () async {
-      final MockProfileRepository slowRepo = MockProfileRepository(
-        simulatedDelay: const Duration(seconds: 10),
-      );
-      final ProfileBloc slowBloc = ProfileBloc(profileRepository: slowRepo);
-
-      slowBloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
-      slowBloc.add(const ProfileStepChanged(3));
-      slowBloc.add(const ProfileSubmitted());
-      // Second dispatch while loading — must be ignored
-      slowBloc.add(const ProfileSubmitted());
+    test('ProfileSubmitted is ignored if already loading or succeeded', () async {
+      bloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
+      bloc.add(const ProfileStepChanged(3));
+      bloc.add(const ProfileSubmitted());
+      bloc.add(const ProfileSubmitted()); // second — must be dropped
 
       await expectLater(
-        slowBloc.stream,
+        bloc.stream,
         emitsThrough(
           predicate<ProfileState>(
-            (ProfileState s) => s.status == ProfileSubmissionStatus.loading,
+            (ProfileState s) => s.status == ProfileSubmissionStatus.success,
           ),
         ),
       );
 
-      // Only one call should have been made (saveProfile not called twice)
-      expect(slowRepo.saveCallCount, equals(1));
-      slowBloc.close();
+      // Let the event queue drain so the second event has been processed
+      await Future<void>.delayed(Duration.zero);
+
+      expect(repository.saveCallCount, equals(1));
     });
 
     test('ProfileSubmitted blocked if profile cannot submit', () async {
