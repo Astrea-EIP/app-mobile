@@ -119,7 +119,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _lengthController.clear();
                 _stepHeightController.clear();
                 context.read<ProfileBloc>().add(const ProfileResetRequested());
-                _pageController.jumpToPage(0);
               },
             );
           }

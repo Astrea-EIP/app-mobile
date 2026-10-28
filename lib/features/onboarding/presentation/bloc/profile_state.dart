@@ -86,13 +86,15 @@ class ProfileState extends Equatable {
     );
   }
 
+  static const Object _undefined = Object();
+
   ProfileState copyWith({
     int? currentStep,
     ProfileSubmissionStatus? status,
-    MobilityType? mobilityType,
-    double? widthCm,
-    double? lengthCm,
-    double? maxStepHeightCm,
+    Object? mobilityType = _undefined,
+    Object? widthCm = _undefined,
+    Object? lengthCm = _undefined,
+    Object? maxStepHeightCm = _undefined,
     RoutePreferences? preferences,
     String? errorMessage,
     bool clearError = false,
@@ -100,10 +102,14 @@ class ProfileState extends Equatable {
     return ProfileState(
       currentStep: currentStep ?? this.currentStep,
       status: status ?? this.status,
-      mobilityType: mobilityType ?? this.mobilityType,
-      widthCm: widthCm ?? this.widthCm,
-      lengthCm: lengthCm ?? this.lengthCm,
-      maxStepHeightCm: maxStepHeightCm ?? this.maxStepHeightCm,
+      mobilityType: mobilityType == _undefined
+          ? this.mobilityType
+          : mobilityType as MobilityType?,
+      widthCm: widthCm == _undefined ? this.widthCm : widthCm as double?,
+      lengthCm: lengthCm == _undefined ? this.lengthCm : lengthCm as double?,
+      maxStepHeightCm: maxStepHeightCm == _undefined
+          ? this.maxStepHeightCm
+          : maxStepHeightCm as double?,
       preferences: preferences ?? this.preferences,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );

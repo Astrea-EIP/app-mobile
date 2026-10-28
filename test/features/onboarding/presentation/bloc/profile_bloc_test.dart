@@ -140,6 +140,26 @@ void main() {
       expect(updatedStep.errorMessage, equals('Une erreur est survenue'));
     });
 
+    test('copyWith can clear nullable fields back to null', () {
+      const ProfileState withDims = ProfileState(
+        mobilityType: MobilityType.manualWheelchair,
+        widthCm: 65,
+        lengthCm: 105,
+        maxStepHeightCm: 4,
+      );
+      expect(withDims.isDimensionsValid, isTrue);
+
+      final ProfileState cleared = withDims.copyWith(
+        widthCm: null,
+        lengthCm: null,
+        maxStepHeightCm: null,
+      );
+      expect(cleared.widthCm, isNull);
+      expect(cleared.lengthCm, isNull);
+      expect(cleared.maxStepHeightCm, isNull);
+      expect(cleared.isDimensionsValid, isFalse);
+    });
+
     test('equality and props work as expected', () {
       const ProfileState s1 = ProfileState(currentStep: 1);
       const ProfileState s2 = ProfileState(currentStep: 1);
@@ -456,6 +476,47 @@ void main() {
 
       failingBloc.close();
     });
+
+    test(
+      'ProfileDimensionsChanged with null values invalidates previously filled dimensions',
+      () async {
+        bloc.add(const ProfileMobilitySelected(MobilityType.manualWheelchair));
+        bloc.add(
+          const ProfileDimensionsChanged(
+            widthCm: 65,
+            lengthCm: 105,
+            maxStepHeightCm: 4,
+          ),
+        );
+        await expectLater(
+          bloc.stream,
+          emitsThrough(
+            predicate<ProfileState>((ProfileState s) => s.isDimensionsValid),
+          ),
+        );
+
+        // User clears the fields — should invalidate
+        bloc.add(
+          const ProfileDimensionsChanged(
+            widthCm: null,
+            lengthCm: null,
+            maxStepHeightCm: null,
+          ),
+        );
+        await expectLater(
+          bloc.stream,
+          emits(
+            predicate<ProfileState>(
+              (ProfileState s) =>
+                  s.widthCm == null &&
+                  s.lengthCm == null &&
+                  s.maxStepHeightCm == null &&
+                  s.isDimensionsValid == false,
+            ),
+          ),
+        );
+      },
+    );
 
     test('ProfileResetRequested resets state to initial', () async {
       bloc.add(const ProfileMobilitySelected(MobilityType.pedestrian));
