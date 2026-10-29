@@ -3,13 +3,15 @@ title: app-mobile
 sidebar_position: 1
 ---
 
-# app-mobile
+# Documentation Mobile Astrea
 
-## Purpose
+## Objectif
 
-This directory contains repository-local mobile documentation.
+Ce répertoire contient la documentation technique locale de l'application mobile Flutter Astrea (`Astrea-EIP/app-mobile`).
 
-## Scope
+## Périmètre
 
-Use this directory for setup, architecture, and mobile-specific implementation details.
-Use the central handbook for organization-wide rules.
+- **[Architecture](architecture.md)** : Organisation modulaire Clean Architecture / BLoC, design tokens Astrea, accessibilité RGAA / WCAG 2.2 AA et suite de tests.
+- **[Installation & Validation](setup.md)** : Commandes de build, test et validation qualité avant pull request.
+
+Pour les normes d'ingénierie transversales à l'ensemble du projet Astrea, consulter le handbook central (`Astrea-EIP/docs`).
