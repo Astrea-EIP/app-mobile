@@ -24,20 +24,65 @@ Le projet adopte une organisation **Feature-First / Clean Architecture** modulai
 ```
 lib/
 ├── core/
-│   ├── network/                # Clients HTTP, intercepteurs et configuration réseau
+│   ├── network/                # Client HTTP Astrea (token anonyme) et constantes d'API
 │   ├── theme/                  # Fondations Figma, design tokens, typographie, accessibilité
 │   └── widgets/                # Composants transversaux partagés
 ├── features/
+│   ├── itinerary/              # Calcul d'itinéraire via l'API backend
+│   │   └── data/
+│   │       ├── models/         # CreateItineraryRequest, ItineraryResponse, PointResponse
+│   │       └── repositories/   # ItineraryRepository (contrat) & HttpItineraryRepository
 │   └── onboarding/             # Module profil d'accessibilité utilisateur
 │       ├── data/
 │       │   ├── models/         # Modèles de données immuables & validation métier
-│       │   └── repositories/   # Contrats d'accès aux données & mocks
+│       │   └── repositories/   # Contrat, implémentation HTTP & mock
 │       └── presentation/
 │           ├── bloc/           # Gestion de l'état (BLoC, événements, états)
 │           ├── screens/        # Écrans PageView et écran de confirmation
 │           └── widgets/        # Composants visuels atomiques & accessibles
 └── main.dart                   # Point d'entrée de l'application & injection de dépendances
 ```
+
+---
+
+## Intégration Backend (`api-back`)
+
+Le client réseau cible l'API ASP.NET Core [`Astrea-EIP/api-back`](https://github.com/Astrea-EIP/api-back) (REST/JSON, préfixe de version `/v0/`).
+
+```mermaid
+sequenceDiagram
+    participant App as AstreaApiClient
+    participant API as api-back
+    App->>API: GET /v0/auth/anonymous
+    API-->>App: 202 { "accessToken": "..." }
+    App->>API: POST /v0/itinerary (header access-token)
+    alt token inconnu (redémarrage de l'API)
+        API-->>App: 401
+        App->>API: GET /v0/auth/anonymous
+        App->>API: POST /v0/itinerary (nouveau token)
+    end
+    API-->>App: 201 { "points": [ { "lat", "lng" } ] }
+```
+
+- **`ApiConstants`** : URL de base lue depuis `--dart-define=API_BASE_URL` (défaut `http://10.0.2.2:5217`, alias de l'hôte pour l'émulateur Android), chemins d'endpoints et nom du header `access-token`.
+- **`AstreaApiClient`** : obtient et met en cache en mémoire le token anonyme, l'envoie dans le header `access-token`, et rejoue la requête une fois après un `401`. Chaque appel expire après 10 s (`TimeoutException`) pour ne jamais bloquer l'interface si l'API est injoignable. Toute autre réponse inattendue lève une `ApiException`.
+- **`HttpProfileRepository`** : implémentation de production de `ProfileRepository`. L'API n'expose pas encore d'endpoint profil : le profil reste **en mémoire** (perdu au redémarrage). Le token est pré-chargé **en arrière-plan** (sans attente) : une API lente ou injoignable ne ralentit ni ne bloque l'onboarding, et le token est redemandé au premier appel d'itinéraire.
+- **`HttpItineraryRepository`** : construit un `CreateItineraryRequest` depuis l'`AccessibilityProfile` et appelle `POST /v0/itinerary`. Aucun écran ne l'utilise encore.
+
+### Correspondance profil mobile → API
+
+| `MobilityType` (mobile) | `mobility_profile` (API) |
+|---|---|
+| `manualWheelchair`, `electricWheelchair` | `1` Wheelchair |
+| `walkingWithAssistance` | `2` Crutches (équivalent le plus proche) |
+| `pedestrian`, `stroller` | `0` Pedestrian (l'API n'a pas de profil poussette) |
+
+| Donnée mobile | Champ API |
+|---|---|
+| `dimensions.widthCm` (Wheelchair) | `wheelchair_width` en **mètres** (`widthCm / 100`, plage API `]0 ; 2]`) |
+| `!preferences.avoidStairs` (Crutches) | `can_climb_stairs` |
+
+Non renseignés pour l'instant car non collectés par l'onboarding : `physical_strength`, `is_accompanied`, `path_preferences`. Le profil `Blind` (`3`) n'a pas d'équivalent côté mobile.
 
 ---
 
@@ -129,7 +174,7 @@ Pour garantir la maintenabilité et éviter toute duplication de code à travers
 
 ---
 
-## Stratégie de Tests (81 tests automatisés · 100% de réussite)
+## Stratégie de Tests (101 tests automatisés · 100% de réussite)
 
 La suite de tests automatisée couvre 100% de la chaîne de valeur :
 
@@ -143,7 +188,11 @@ La suite de tests automatisée couvre 100% de la chaîne de valeur :
    - `mobility_type_card_test.dart` : Rendu des cartes, pastilles et sélection.
    - `preference_toggle_tile_test.dart` : Interactivité des interrupteurs adaptatifs.
    - `dimensions_step_form_test.dart` : Validation en direct des champs numériques.
-7. **Tests d'Intégration Parcours** (`test/features/onboarding/presentation/screens/`) :
+7. **Tests d'Intégration Backend** (client HTTP simulé avec `MockClient`, aucun réseau réel) :
+   - `test/core/network/astrea_api_client_test.dart` : lecture du token (`accessToken`), mise en cache, header `access-token`, rejeu unique après `401`, expiration (timeout), `ApiException`.
+   - `test/features/itinerary/data/models/itinerary_models_test.dart` : correspondance profil mobile → requête API, désérialisation des points.
+   - `test/features/onboarding/data/repositories/http_profile_repository_test.dart` : sauvegarde du profil même si l'API est injoignable.
+8. **Tests d'Intégration Parcours** (`test/features/onboarding/presentation/screens/`) :
    - `onboarding_screen_test.dart` : Parcours piéton complet (saut conditionnel d'étape), parcours fauteuil (saisie des dimensions, navigation retour), soumission et affichage du succès.
    - `onboarding_success_screen_test.dart` : Synthèse récapitulative et bouton de réinitialisation.
 
