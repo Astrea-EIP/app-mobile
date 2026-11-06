@@ -119,6 +119,155 @@ void main() {
       );
     });
 
+    test('accepts any 2xx status for the token and the itinerary', () async {
+      final MockClient mock = MockClient((http.Request request) async {
+        if (request.url.path == '/v0/auth/anonymous') {
+          return http.Response(
+            jsonEncode(<String, String>{'accessToken': 'abc'}),
+            200,
+          );
+        }
+        return http.Response(jsonEncode(<String, Object>{'points': []}), 200);
+      });
+      final AstreaApiClient client = AstreaApiClient(
+        httpClient: mock,
+        baseUrl: base,
+      );
+
+      final Map<String, dynamic> json = await client.postItinerary(
+        <String, dynamic>{},
+      );
+
+      expect(json['points'], isEmpty);
+    });
+
+    test('parses the backend error body into the exception', () async {
+      final MockClient mock = MockClient((http.Request request) async {
+        if (request.url.path == '/v0/auth/anonymous') {
+          return token('abc');
+        }
+        return http.Response(
+          jsonEncode(<String, String>{
+            'error': 'API error: boom',
+            'errorId': 'e-123',
+          }),
+          500,
+        );
+      });
+      final AstreaApiClient client = AstreaApiClient(
+        httpClient: mock,
+        baseUrl: base,
+      );
+
+      expect(
+        client.postItinerary(<String, dynamic>{}),
+        throwsA(
+          isA<ApiException>()
+              .having((ApiException e) => e.statusCode, 'status', 500)
+              .having(
+                (ApiException e) => e.message,
+                'message',
+                'API error: boom',
+              )
+              .having((ApiException e) => e.errorId, 'errorId', 'e-123'),
+        ),
+      );
+    });
+
+    test('falls back to the status when the error body is not JSON', () async {
+      final MockClient mock = MockClient((http.Request request) async {
+        if (request.url.path == '/v0/auth/anonymous') {
+          return token('abc');
+        }
+        return http.Response('<html>Bad gateway</html>', 502);
+      });
+      final AstreaApiClient client = AstreaApiClient(
+        httpClient: mock,
+        baseUrl: base,
+      );
+
+      expect(
+        client.postItinerary(<String, dynamic>{}),
+        throwsA(
+          isA<ApiException>()
+              .having((ApiException e) => e.message, 'message', 'HTTP 502')
+              .having((ApiException e) => e.errorId, 'errorId', isNull),
+        ),
+      );
+    });
+
+    test('concurrent calls share a single token request', () async {
+      int tokenCalls = 0;
+      final Completer<http.Response> release = Completer<http.Response>();
+      final MockClient mock = MockClient((http.Request request) {
+        if (request.url.path == '/v0/auth/anonymous') {
+          tokenCalls++;
+          return release.future;
+        }
+        return Future<http.Response>.value(
+          http.Response(jsonEncode(<String, Object>{'points': []}), 201),
+        );
+      });
+      final AstreaApiClient client = AstreaApiClient(
+        httpClient: mock,
+        baseUrl: base,
+      );
+
+      final Future<void> warmUp = client.ensureAuthenticated();
+      final Future<Map<String, dynamic>> itinerary = client.postItinerary(
+        <String, dynamic>{},
+      );
+      release.complete(token('abc'));
+      await Future.wait(<Future<Object?>>[warmUp, itinerary]);
+
+      expect(tokenCalls, 1);
+    });
+
+    test('a failed token request can be retried by the next call', () async {
+      int tokenCalls = 0;
+      final MockClient mock = MockClient((http.Request request) async {
+        tokenCalls++;
+        return tokenCalls == 1 ? http.Response('', 500) : token('abc');
+      });
+      final AstreaApiClient client = AstreaApiClient(
+        httpClient: mock,
+        baseUrl: base,
+      );
+
+      await expectLater(
+        client.ensureAuthenticated(),
+        throwsA(isA<ApiException>()),
+      );
+      await client.ensureAuthenticated();
+
+      expect(tokenCalls, 2);
+    });
+
+    test('concurrent 401s refresh the token only once', () async {
+      int tokenCalls = 0;
+      final MockClient mock = MockClient((http.Request request) async {
+        if (request.url.path == '/v0/auth/anonymous') {
+          tokenCalls++;
+          return token('t$tokenCalls');
+        }
+        return request.headers['access-token'] == 't1'
+            ? http.Response('', 401)
+            : http.Response(jsonEncode(<String, Object>{'points': []}), 201);
+      });
+      final AstreaApiClient client = AstreaApiClient(
+        httpClient: mock,
+        baseUrl: base,
+      );
+      await client.ensureAuthenticated();
+
+      await Future.wait(<Future<Map<String, dynamic>>>[
+        client.postItinerary(<String, dynamic>{}),
+        client.postItinerary(<String, dynamic>{}),
+      ]);
+
+      expect(tokenCalls, 2);
+    });
+
     test('times out instead of hanging when the API never answers', () async {
       final Completer<http.Response> never = Completer<http.Response>();
       final AstreaApiClient client = AstreaApiClient(
