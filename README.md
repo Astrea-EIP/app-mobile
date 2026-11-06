@@ -29,6 +29,12 @@ dart format --set-exit-if-changed .
 flutter test
 ```
 
+## Backend
+
+The app consumes [`api-back`](https://github.com/Astrea-EIP/api-back). The base URL defaults to the
+Android emulator alias `http://10.0.2.2:5217` and can be overridden with
+`--dart-define=API_BASE_URL=...`. See `docs/setup.md` for the per-device table.
+
 ## Documentation
 
 Repository-specific mobile documentation lives under `docs/`.
