@@ -30,7 +30,7 @@ lib/
 ├── features/
 │   ├── itinerary/              # Calcul d'itinéraire via l'API backend
 │   │   └── data/
-│   │       ├── models/         # CreateItineraryRequest, ItineraryResponse, PointResponse
+│   │       ├── models/         # CreateItineraryRequest, ItineraryResponse, PointResponse, ItineraryException
 │   │       └── repositories/   # ItineraryRepository (contrat) & HttpItineraryRepository
 │   └── onboarding/             # Module profil d'accessibilité utilisateur
 │       ├── data/
@@ -65,9 +65,20 @@ sequenceDiagram
 ```
 
 - **`ApiConstants`** : URL de base lue depuis `--dart-define=API_BASE_URL` (défaut `http://10.0.2.2:5217`, alias de l'hôte pour l'émulateur Android), chemins d'endpoints et nom du header `access-token`.
-- **`AstreaApiClient`** : obtient et met en cache en mémoire le token anonyme, l'envoie dans le header `access-token`, et rejoue la requête une fois après un `401`. Chaque appel expire après 10 s (`TimeoutException`) pour ne jamais bloquer l'interface si l'API est injoignable. Toute autre réponse inattendue lève une `ApiException`.
+- **`AstreaApiClient`** : obtient et met en cache en mémoire le token anonyme, l'envoie dans le header `access-token`, et rejoue la requête une fois après un `401`. Toute réponse `2xx` est acceptée (le code exact, `200`, `201` ou `202`, n'est pas imposé). Chaque appel expire après 10 s (`TimeoutException`) pour ne jamais bloquer l'interface si l'API est injoignable.
+  - **Un seul token à la fois** : les appels simultanés (pré-chargement en arrière-plan et première requête d'itinéraire) partagent la même requête de token en cours, car le back ne purge jamais ses tokens. Après un `401`, seul le token réellement utilisé est invalidé, pour ne pas écraser un token plus récent obtenu par une requête concurrente.
+  - **Erreurs** : toute réponse non-`2xx` lève une `ApiException` dont `message` est le champ `error` du corps `{ "error": "..." }` du back (repli sur `HTTP <code>` si le corps n'est pas ce JSON) et `errorId` l'identifiant de support renvoyé sur les `500`.
 - **`HttpProfileRepository`** : implémentation de production de `ProfileRepository`. L'API n'expose pas encore d'endpoint profil : le profil reste **en mémoire** (perdu au redémarrage). Le token est pré-chargé **en arrière-plan** (sans attente) : une API lente ou injoignable ne ralentit ni ne bloque l'onboarding, et le token est redemandé au premier appel d'itinéraire.
-- **`HttpItineraryRepository`** : construit un `CreateItineraryRequest` depuis l'`AccessibilityProfile` et appelle `POST /v0/itinerary`. Aucun écran ne l'utilise encore.
+- **`HttpItineraryRepository`** : construit un `CreateItineraryRequest` depuis l'`AccessibilityProfile` et appelle `POST /v0/itinerary`. Aucun écran ne l'utilise encore. Il traduit les erreurs du back en exceptions métier (`ItineraryException`, `features/itinerary/data/models/itinerary_exceptions.dart`) :
+
+| Statut du back | Exception | Sens |
+|---|---|---|
+| `400` | `InvalidItineraryRequestException` | Requête invalide ou adresse introuvable |
+| `422` | `NoRouteFoundException` | Point hors couverture de la carte, ou aucun itinéraire pour ce profil : cas métier attendu, pas un plantage |
+| `5xx` | `ItineraryServerException` | Erreur inattendue du back (avec `errorId`) |
+| autre (`401` persistant, `404`...) | `ApiException` | Remontée telle quelle |
+
+  Le `message` de chaque exception est le texte `error` du back, que l'interface pourra afficher ou traduire.
 
 ### Correspondance profil mobile → API
 
@@ -174,7 +185,7 @@ Pour garantir la maintenabilité et éviter toute duplication de code à travers
 
 ---
 
-## Stratégie de Tests (101 tests automatisés · 100% de réussite)
+## Stratégie de Tests (112 tests automatisés · 100% de réussite)
 
 La suite de tests automatisée couvre 100% de la chaîne de valeur :
 
@@ -189,7 +200,8 @@ La suite de tests automatisée couvre 100% de la chaîne de valeur :
    - `preference_toggle_tile_test.dart` : Interactivité des interrupteurs adaptatifs.
    - `dimensions_step_form_test.dart` : Validation en direct des champs numériques.
 7. **Tests d'Intégration Backend** (client HTTP simulé avec `MockClient`, aucun réseau réel) :
-   - `test/core/network/astrea_api_client_test.dart` : lecture du token (`accessToken`), mise en cache, header `access-token`, rejeu unique après `401`, expiration (timeout), `ApiException`.
+   - `test/core/network/astrea_api_client_test.dart` : lecture du token (`accessToken`), mise en cache, header `access-token`, rejeu unique après `401` (y compris `401` simultanés), token unique pour les appels simultanés, statuts `2xx`, lecture du corps d'erreur (`error`, `errorId`), expiration (timeout), `ApiException`.
+   - `test/features/itinerary/data/repositories/itinerary_repository_test.dart` : correspondance des statuts `400`, `422` et `5xx` vers les exceptions métier.
    - `test/features/itinerary/data/models/itinerary_models_test.dart` : correspondance profil mobile → requête API, désérialisation des points.
    - `test/features/onboarding/data/repositories/http_profile_repository_test.dart` : sauvegarde du profil même si l'API est injoignable.
 8. **Tests d'Intégration Parcours** (`test/features/onboarding/presentation/screens/`) :
