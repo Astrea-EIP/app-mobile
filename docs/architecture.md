@@ -32,6 +32,9 @@ lib/
 │   │   └── data/
 │   │       ├── models/         # CreateItineraryRequest, ItineraryResponse, PointResponse, ItineraryException
 │   │       └── repositories/   # ItineraryRepository (contrat) & HttpItineraryRepository
+│   ├── map/                    # Carte de base (maplibre_gl, style vectoriel CARTO Positron comme le prototype) centrée sur la position (geolocator)
+│   │   ├── data/               # UserLocation, LocationException, LocationRepository (contrat) & GeolocatorLocationRepository
+│   │   └── presentation/       # MapBloc (permission, GPS, position), MapScreen et écrans de repli
 │   └── onboarding/             # Module profil d'accessibilité utilisateur
 │       ├── data/
 │       │   ├── models/         # Modèles de données immuables & validation métier
