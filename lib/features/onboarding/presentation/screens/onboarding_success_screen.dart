@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:astrea/core/theme/app_theme.dart';
 import 'package:astrea/core/widgets/widgets.dart';
+import 'package:astrea/features/map/data/repositories/location_repository.dart';
+import 'package:astrea/features/map/presentation/screens/map_screen.dart';
 import 'package:astrea/features/onboarding/data/models/accessibility_profile.dart';
 
 class OnboardingSuccessScreen extends StatelessWidget {
@@ -161,13 +164,11 @@ class OnboardingSuccessScreen extends StatelessWidget {
               AstreaButton.primary(
                 label: 'Commencer l\'exploration',
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Configuration terminée ! Bienvenue sur Astrea.',
-                        style: TextStyle(color: AppColors.onPrimary),
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => MapScreen(
+                        locationRepository: context.read<LocationRepository>(),
                       ),
-                      backgroundColor: AppColors.primaryStrong,
                     ),
                   );
                 },
