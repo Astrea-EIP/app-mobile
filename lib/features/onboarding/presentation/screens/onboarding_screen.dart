@@ -113,15 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         if (state.status == ProfileSubmissionStatus.success) {
           final AccessibilityProfile? profile = state.toProfile;
           if (profile != null) {
-            return OnboardingSuccessScreen(
-              profile: profile,
-              onRestart: () {
-                _widthController.clear();
-                _lengthController.clear();
-                _stepHeightController.clear();
-                context.read<ProfileBloc>().add(const ProfileResetRequested());
-              },
-            );
+            return OnboardingSuccessScreen(profile: profile);
           }
         }
 
