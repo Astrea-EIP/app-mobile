@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:astrea/core/theme/app_theme.dart';
 
-enum AstreaButtonVariant { primary, outlined, text }
+enum AstreaButtonVariant { primary, outlined, secondary, text }
 
 /// Reusable accessible button conforming to Astrea Design Tokens & RGAA.
 class AstreaButton extends StatelessWidget {
@@ -47,6 +47,26 @@ class AstreaButton extends StatelessWidget {
          label: label,
          onPressed: onPressed,
          variant: AstreaButtonVariant.outlined,
+         icon: icon,
+         iconAfter: iconAfter,
+         isLoading: isLoading,
+         isFullWidth: isFullWidth,
+         key: key,
+       );
+
+  /// White button with a soft 1.5 px border (Figma "Button / Secondary").
+  const AstreaButton.secondary({
+    required String label,
+    required VoidCallback? onPressed,
+    IconData? icon,
+    bool iconAfter = false,
+    bool isLoading = false,
+    bool isFullWidth = true,
+    Key? key,
+  }) : this(
+         label: label,
+         onPressed: onPressed,
+         variant: AstreaButtonVariant.secondary,
          icon: icon,
          iconAfter: iconAfter,
          isLoading: isLoading,
@@ -155,6 +175,24 @@ class AstreaButton extends StatelessWidget {
             side: BorderSide(
               color: isEnabled ? AppColors.borderStrong : AppColors.border,
             ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+            ),
+          ),
+          child: content,
+        );
+        break;
+
+      case AstreaButtonVariant.secondary:
+        button = OutlinedButton(
+          onPressed: isEnabled ? onPressed : null,
+          style: OutlinedButton.styleFrom(
+            backgroundColor: AppColors.surface,
+            foregroundColor: AppColors.ink,
+            disabledForegroundColor: AppColors.muted,
+            minimumSize: Size(isFullWidth ? double.infinity : 0, 52),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            side: const BorderSide(color: AppColors.border, width: 1.5),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
