@@ -28,6 +28,15 @@ lib/
 │   ├── theme/                  # Fondations Figma, design tokens, typographie, accessibilité
 │   └── widgets/                # Composants transversaux partagés
 ├── features/
+│   ├── auth/                   # Connexion / inscription, session conservée entre deux lancements
+│   │   ├── data/
+│   │   │   ├── models/         # AuthSession, AuthRegistration, AuthException
+│   │   │   ├── repositories/   # AuthRepository (contrat) & MockAuthRepository
+│   │   │   └── storage/        # TokenStorage (contrat), SecureTokenStorage & InMemoryTokenStorage
+│   │   └── presentation/
+│   │       ├── bloc/           # AuthBloc, événements, états
+│   │       ├── screens/        # AuthScreen (connexion / inscription) et AuthGate (redirection)
+│   │       └── widgets/        # Formulaires, en-tête logo, bandeau d'erreur, case de consentement
 │   ├── itinerary/              # Calcul d'itinéraire via l'API backend
 │   │   └── data/
 │   │       ├── models/         # CreateItineraryRequest, ItineraryResponse, PointResponse, ItineraryException
@@ -100,6 +109,72 @@ Non renseignés pour l'instant car non collectés par l'onboarding : `physical_s
 
 ---
 
+## Module Authentification (`features/auth/`)
+
+L'écran d'accès permet de **se connecter** ou de **créer un compte**, puis conserve la session entre deux lancements de l'application.
+
+> **Le backend n'expose pas encore de routes d'authentification.** `MockAuthRepository` simule les réponses : les comptes vivent en mémoire (perdus au redémarrage) et aucun compte n'est pré-créé. Seul le token est conservé sur l'appareil. Le mot de passe n'est jamais stocké.
+
+### Parcours
+
+```mermaid
+graph TD
+    Start[Lancement] --> Splash[Splash en dégradé · 0,8 s minimum]
+    Splash --> Check{Token stocké valide ?}
+    Check -- non --> Auth[AuthScreen : Se connecter / Créer un compte]
+    Check -- oui --> Profile{Profil d'accessibilité existant ?}
+    Auth -->|succès| Profile
+    Profile -- non --> Onboarding[Onboarding du profil]
+    Profile -- oui --> Map[Carte]
+    Onboarding --> Map
+```
+
+### Couche données (`features/auth/data/`)
+
+- **`AuthSession`** (token, e-mail, nom affiché) et **`AuthRegistration`** (nom, e-mail, mot de passe, date de naissance).
+- **`AuthException`** : erreurs métier au message déjà en français (`invalidCredentials`, `emailAlreadyUsed`, `sessionExpired`). Toute autre exception est traitée comme une panne technique.
+- **`AuthRepository`** : contrat `login`, `register`, `restoreSession(token)` et `logout`. `MockAuthRepository` en est l'implémentation actuelle : les tokens sont auto-descriptifs (`mock.<expiration>.<charge>`, valables 30 jours), donc un token stocké reste valide après un redémarrage même si les comptes en mémoire ont disparu.
+- **`TokenStorage`** : `SecureTokenStorage` s'appuie sur `flutter_secure_storage` (Keystore Android, Keychain iOS). Une clé illisible est traitée comme « déconnecté ». `InMemoryTokenStorage` sert aux tests.
+
+### Gestion de l'état (`features/auth/presentation/bloc/`)
+
+```mermaid
+graph LR
+    UI[AuthScreen / AuthGate] -->|AuthLoginSubmitted / AuthRegisterSubmitted| Bloc[AuthBloc]
+    Bloc -->|login / register / restoreSession| Repo[AuthRepository]
+    Bloc -->|write / read / delete| Store[TokenStorage]
+    Bloc -->|AuthState| UI
+```
+
+- **Événements** : `AuthStarted` (restaure la session depuis le token stocké), `AuthLoginSubmitted`, `AuthRegisterSubmitted`, `AuthLogoutRequested`, `AuthErrorCleared` (efface l'erreur quand on change d'onglet).
+- **États** (`AuthStatus`) : `checking` (démarrage), `unauthenticated`, `submitting`, `authenticated`, `failure` (avec `errorMessage`).
+- **Token invalide** : il est supprimé du stockage. **Panne technique** au démarrage (réseau…) : le token est conservé pour le prochain lancement.
+- **Déconnexion** : le token local est supprimé avant tout appel réseau, elle ne dépend donc jamais de l'API. Aucun bouton de déconnexion n'existe encore dans l'interface.
+
+### Écrans (`features/auth/presentation/`)
+
+- **`AuthGate`** : racine de l'application, pilotée par l'état (aucune navigation manuelle). Affiche le splash pendant la vérification du token (0,8 s minimum, réglable via `minSplashDuration`), puis l'écran d'accès, ou l'accueil de l'utilisateur connecté : **la carte si un profil d'accessibilité existe, l'onboarding sinon**.
+- **`AuthScreen`** : un seul écran, deux modes via `AstreaSegmentedControl`, fidèle aux frames Figma « Parcours 1 — Compte ».
+  - *Se connecter* : e-mail, mot de passe, lien « Mot de passe oublié ? ».
+  - *Créer un compte* : prénom et nom, e-mail, mot de passe, date de naissance (`JJ / MM / AAAA`, séparateurs ajoutés pendant la saisie), consentement au traitement de la localisation et du profil de mobilité.
+  - Les erreurs de validation s'affichent sous chaque champ, l'erreur d'authentification dans un bandeau annoncé aux lecteurs d'écran (`liveRegion`).
+  - « Continuer avec Google » et « Mot de passe oublié ? » affichent « bientôt disponible » : ces parcours sont hors périmètre.
+- **Validation** (`AuthValidators`) : e-mail de forme valide, prénom et nom d'au moins 2 caractères, date réelle comprise entre 1900 et aujourd'hui. À la connexion, seule la présence du mot de passe est vérifiée.
+  - **Mot de passe à l'inscription : au moins 8 caractères, valeur provisoire** (`AuthValidators.minPasswordLength`) à aligner sur la règle du backend quand elle sera définie.
+
+### Accessibilité
+
+- Les liens textuels ont une cible tactile de 44 dp de haut sur toute la largeur, tout en gardant l'espacement exact de la maquette.
+- Les champs désactivés pendant l'envoi, le bouton principal affiche un indicateur de chargement, et « Connexion réussie. » est annoncé aux lecteurs d'écran.
+
+### Identité visuelle
+
+- **Logo** : `assets/images/astrea_logo.png` (en-tête de l'écran d'accès) et `astrea_pedestrian.png` (splash).
+- **Icône de l'application** : générée depuis le logo officiel, en icône adaptative Android (fond dégradé + piéton) avec repli classique, et en jeu complet iOS.
+- **Écran de lancement Android** : dégradé avec le piéton avant Android 12. À partir d'Android 12, le système n'accepte qu'une couleur de fond unie : le vert de la marque, suivi du splash Flutter en dégradé avec le piéton à la même position.
+
+---
+
 ## Module Profil d'Accessibilité (Onboarding)
 
 ### 1. Modèles de Données (`features/onboarding/data/models/`)
@@ -140,7 +215,7 @@ graph LR
 - `ProfileNextStepRequested` : Avancement à l'étape suivante (validation préalable, saut automatique de l'étape dimensions pour les profils non-fauteuil).
 - `ProfilePreviousStepRequested` : Retour en arrière respectant le saut conditionnel.
 - `ProfileSubmitted` : Soumission du profil validé au repository.
-- `ProfileResetRequested` : Réinitialisation pour nouveau test / démo.
+- `ProfileResetRequested` : Réinitialisation de l'état du profil (plus déclenchée par l'interface depuis la suppression du bouton de démonstration).
 
 #### États (`ProfileState`)
 - `currentStep` : Index de l'étape courante (0: Mobilité, 1: Dimensions, 2: Préférences, 3: Récapitulatif).
@@ -180,7 +255,10 @@ Pour garantir la maintenabilité et éviter toute duplication de code à travers
 - **`AstreaButton`** : Bouton universel accessible conforme RGAA (hauteur min 52 dp, ratio contraste certifié 5.55:1, spinner de chargement intégré, gestion de texte flexible prévenant l'overflow).
   - `AstreaButton.primary` : Bouton vert d'action principale (`#4CAF50`).
   - `AstreaButton.outlined` : Bouton secondaire avec bordure contrastée.
-  - `AstreaButton.text` : Bouton discret pour actions secondaires (ex. recommencer démo).
+  - `AstreaButton.secondary` : Bouton blanc à bordure douce de 1,5 px (« Continuer avec Google » dans la maquette).
+  - `AstreaButton.text` : Bouton discret pour actions secondaires.
+- **`AstreaTextField`** : Champ de saisie de 48 dp (bordure forte de 1,5 px, rayon 10, placeholder atténué), avec état d'erreur (bordure et message en couleur `error`) et état de focus.
+- **`AstreaSegmentedControl`** : Sélecteur segmenté de 52 dp, segment actif surélevé sur fond blanc (« Se connecter » / « Créer un compte »).
 - **`AstreaToggleTile`** : Ligne d'option interactive avec pastille d'icône thématique, titre, sous-titre explicatif et interrupteur adaptatif nativement accessible.
 - **`AstreaSelectableCard`** : Carte de sélection avec pastille colorée, description, badge d'état ('Sélectionné') et indicateur radio animé.
 - **`AstreaSegmentedProgressBar`** : Stepper de progression à dégradé de marque continu (`#43A047` → `#FFA726`) via `ShaderMask`.
@@ -188,7 +266,7 @@ Pour garantir la maintenabilité et éviter toute duplication de code à travers
 
 ---
 
-## Stratégie de Tests (112 tests automatisés · 100% de réussite)
+## Stratégie de Tests (167 tests automatisés · 100% de réussite)
 
 La suite de tests automatisée couvre 100% de la chaîne de valeur :
 
@@ -210,6 +288,12 @@ La suite de tests automatisée couvre 100% de la chaîne de valeur :
 8. **Tests d'Intégration Parcours** (`test/features/onboarding/presentation/screens/`) :
    - `onboarding_screen_test.dart` : Parcours piéton complet (saut conditionnel d'étape), parcours fauteuil (saisie des dimensions, navigation retour), soumission et affichage du succès.
    - `onboarding_success_screen_test.dart` : Synthèse récapitulative et bouton de réinitialisation.
+9. **Tests Authentification** (`test/features/auth/`, comptes de test déclarés dans `test_account.dart`) :
+   - `data/repositories/auth_repository_test.dart` : connexion, mauvais mot de passe, e-mail inconnu, inscription (casse de l'e-mail), doublon, restauration d'un token après redémarrage, token expiré ou mal formé.
+   - `presentation/auth_validators_test.dart` : règles de validation, dates impossibles ou futures, formatage `JJ / MM / AAAA`.
+   - `presentation/bloc/auth_bloc_test.dart` : démarrage avec et sans token, token invalide supprimé, panne technique, connexion, inscription, erreurs, déconnexion locale même si l'API échoue.
+   - `presentation/screens/auth_screen_test.dart` : contenu fidèle à la maquette, écarts de mise en page (champs de 48 dp, espacement de 12 dp), erreurs de validation, identifiants invalides, connexion et inscription complètes jusqu'à l'onboarding, changement d'onglet.
+   - `test/widget_test.dart` : démarrage sur l'écran de connexion sans token, saut de la connexion avec un token valide.
 
 ```bash
 # Exécution de la suite de tests
