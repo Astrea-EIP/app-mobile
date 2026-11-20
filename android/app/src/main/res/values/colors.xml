@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Astrea brand green (gradient start): Android 12+ splash screens only
+         accept a flat background colour, not a gradient. -->
+    <color name="splash_background">#FF43A047</color>
+</resources>
