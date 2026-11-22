@@ -49,6 +49,12 @@ need an HTTPS API.
 The backend has no profile endpoint yet: the accessibility profile is kept in memory only and is lost
 when the app restarts.
 
+The backend has no login or register endpoints yet either: authentication is mocked
+(`MockAuthRepository`). Accounts live in memory and no account is pre-created, so create one from the
+**Créer un compte** tab first. Only the resulting token is stored on the device (`flutter_secure_storage`),
+which keeps the user signed in across restarts. To sign in again after an app restart, uninstall the app
+(there is no sign-out button yet).
+
 ### Troubleshooting
 
 - **`401` on itinerary calls**: tokens live in the API's memory. The client retries once with a fresh

@@ -41,6 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   geolocator: ^14.1.2
   maplibre_gl: ^0.25.0
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +64,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/images/astrea_logo.png
+    - assets/images/astrea_pedestrian.png
 
   fonts:
     - family: Montserrat
