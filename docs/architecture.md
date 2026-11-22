@@ -159,8 +159,9 @@ graph LR
   - *Créer un compte* : prénom et nom, e-mail, mot de passe, date de naissance (`JJ / MM / AAAA`, séparateurs ajoutés pendant la saisie), consentement au traitement de la localisation et du profil de mobilité.
   - Les erreurs de validation s'affichent sous chaque champ, l'erreur d'authentification dans un bandeau annoncé aux lecteurs d'écran (`liveRegion`).
   - « Continuer avec Google » et « Mot de passe oublié ? » affichent « bientôt disponible » : ces parcours sont hors périmètre.
-- **Validation** (`AuthValidators`) : e-mail de forme valide, prénom et nom d'au moins 2 caractères, date réelle comprise entre 1900 et aujourd'hui. À la connexion, seule la présence du mot de passe est vérifiée.
-  - **Mot de passe à l'inscription : au moins 8 caractères, valeur provisoire** (`AuthValidators.minPasswordLength`) à aligner sur la règle du backend quand elle sera définie.
+- **Validation** (`AuthValidators`), alignée sur le [contrat des comptes](https://github.com/Astrea-EIP/api-back/pull/114) proposé par le backend (`RegisterRequest`) : e-mail de forme valide (254 caractères maximum), nom de 1 à 80 caractères, mot de passe de 8 à 128 caractères, date de naissance réelle et **strictement dans le passé** (le backend attend `AAAA-MM-JJ`). À la connexion, seule la présence du mot de passe est vérifiée.
+  - Le serveur reste la source de vérité : ces contrôles évitent seulement un aller-retour réseau. Le contrat est encore au statut « proposé » : à revoir s'il évolue.
+- **Consentement** : le contrat prévoit de le demander à l'enregistrement du **profil** (`consent: true` sur `PUT /v0/users/me/profile`) et non à l'inscription. La case reste dans le formulaire d'inscription, conformément à la maquette Figma actuelle, et sera déplacée avec le branchement du profil.
 
 ### Accessibilité
 
@@ -266,7 +267,7 @@ Pour garantir la maintenabilité et éviter toute duplication de code à travers
 
 ---
 
-## Stratégie de Tests (167 tests automatisés · 100% de réussite)
+## Stratégie de Tests (168 tests automatisés · 100% de réussite)
 
 La suite de tests automatisée couvre 100% de la chaîne de valeur :
 
@@ -290,7 +291,7 @@ La suite de tests automatisée couvre 100% de la chaîne de valeur :
    - `onboarding_success_screen_test.dart` : Synthèse récapitulative et bouton de réinitialisation.
 9. **Tests Authentification** (`test/features/auth/`, comptes de test déclarés dans `test_account.dart`) :
    - `data/repositories/auth_repository_test.dart` : connexion, mauvais mot de passe, e-mail inconnu, inscription (casse de l'e-mail), doublon, restauration d'un token après redémarrage, token expiré ou mal formé.
-   - `presentation/auth_validators_test.dart` : règles de validation, dates impossibles ou futures, formatage `JJ / MM / AAAA`.
+   - `presentation/auth_validators_test.dart` : règles de validation et longueurs du contrat (nom 1-80, e-mail ≤ 254, mot de passe 8-128), dates impossibles, du jour ou futures, formatage `JJ / MM / AAAA`.
    - `presentation/bloc/auth_bloc_test.dart` : démarrage avec et sans token, token invalide supprimé, panne technique, connexion, inscription, erreurs, déconnexion locale même si l'API échoue.
    - `presentation/screens/auth_screen_test.dart` : contenu fidèle à la maquette, écarts de mise en page (champs de 48 dp, espacement de 12 dp), erreurs de validation, identifiants invalides, connexion et inscription complètes jusqu'à l'onboarding, changement d'onglet.
    - `test/widget_test.dart` : démarrage sur l'écran de connexion sans token, saut de la connexion avec un token valide.
